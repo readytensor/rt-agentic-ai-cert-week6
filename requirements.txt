@@ -1,0 +1,9 @@
+langchain~=0.3.25
+langchain_groq~=0.3.2
+langchain_openai~=0.3.23
+langchain_community~=0.3.24
+python-dotenv~=1.1.0
+pyyaml~=6.0.2
+langgraph~=0.4.8
+pyjokes~=0.8.3
+black~=25.1.0 
