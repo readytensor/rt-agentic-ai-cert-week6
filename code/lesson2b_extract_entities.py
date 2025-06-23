@@ -48,6 +48,9 @@ def create_entity_extraction_graph() -> StateGraph:
 
 def visualize_graph(graph: StateGraph, save_path: str = OUTPUTS_DIR):
     """Visualize the graph."""
+    print("Visualizing the entity extraction graph...")
+    print(graph.get_graph().draw_mermaid())
+    # Save the graph as PNG
     png = graph.get_graph().draw_mermaid_png(draw_method=MermaidDrawMethod.API)
     with open(os.path.join(save_path, "graph.png"), "wb") as f:
         f.write(png)
@@ -102,7 +105,7 @@ if __name__ == "__main__":
     # -------------------------------------------------------------------------------
 
      # Example usage
-    sample_text = load_publication_example(2) # ⚠️ CAUTION: SEE NOTE ABOVE
+    sample_text = load_publication_example(1) # ⚠️ CAUTION: SEE NOTE ABOVE
 
     print("=" * 80)
     print("🔍 MULTI-METHOD ENTITY EXTRACTION DEMO")
