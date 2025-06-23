@@ -168,9 +168,6 @@ def run_entity_extraction(
     if entity_types is None:
         entity_types = ["algorithm", "dataset", "tool", "framework", "model", "task"]
 
-    # Load configuration
-    config = load_config(PROMPT_CONFIG_FILE_PATH)
-
     # Create initial state
     initial_state = EntityExtractionState(
         text=text,

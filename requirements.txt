@@ -6,4 +6,6 @@ python-dotenv~=1.1.0
 pyyaml~=6.0.2
 langgraph~=0.4.8
 pyjokes~=0.8.3
-black~=25.1.0 
+black~=25.1.0
+spacy~=3.8.7
+https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl 
