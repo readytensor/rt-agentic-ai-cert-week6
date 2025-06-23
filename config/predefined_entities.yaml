@@ -1,0 +1,12 @@
+variational auto-encoders: model
+mnist: dataset
+anomaly detection: task
+pytorch: framework
+
+
+
+
+
+
+
+

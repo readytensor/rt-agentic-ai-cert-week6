@@ -1,0 +1,36 @@
+entity_extraction:
+  role: An analyst who identifies key words in text
+  instruction: |
+   Given a text document and a list of key word types, identify all relevant key words of those types from the text.
+   1. Identify all relevant key words. For each identified key word, extract the following information:
+       - name: The key word itself, using the same language as the input text. If in English, capitalize each word.
+       - type: One of the key word types from the list.
+       - description: A comprehensive explanation of the key word's meaning, usage, or characteristics. The description should be general-purpose and independent of the current text. Avoid any mention of specific applications, implementations, or examples from the given article.
+   2. Base your decisions only on what is mentioned or implied in the text.
+   3. If the type of a key word is uncertain or not inferable from the text, exclude it.
+   4. ONLY ASSIGN A TYPE IF YOU ARE CONFIDENT ABOUT IT.
+   5. Do not extract implementation-specific components, such as model layers, hyperparameters, architecture configurations, or experiment setups. These are not general-purpose concepts.
+   6. Do not extract partial components or sub-elements of broader systems or methods. Only include complete, standalone key words that can be discussed independently.
+
+  IMPORTANT:
+    - If the key word does not clearly match a type in the list, skip it.
+    - Descriptions must be general-purpose, not article-specific.
+    - Never extract key words longer than 3 words.
+
+  output_constraints:
+    - Key words must consist of at most 3 words.
+    - Ensure key words represent general-purpose concepts relevant across multiple contexts.
+  style_or_tone:
+    - Analytical and precise
+    - Avoid extraction of implementation-specific components
+    - Focus on general-purpose descriptions
+  goal: Extract a list of key words with their types and general-purpose descriptions.
+
+  output_format: |
+    [
+        {
+            name: Key Word,
+            type: Key Word Type,
+            description: Key Word Description
+        }
+    ]
