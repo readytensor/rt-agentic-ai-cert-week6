@@ -305,7 +305,7 @@ Not every task needs reasoning, reflection, or natural language understanding. W
 
 **Examples:**
 
-- Having an agent "decide" between two predetermined options when a simple if/else would work
+- Having an agent "decide" between two predetermined options when a simple if/else would work. This is the classic **LLM-as-Router Overkill** scenario.
 - Using an LLM to parse structured data that could be handled with regex or a simple parser
 - Prompting for arithmetic or other math operations ("What's 15% of $240?")
 - Wrapping simple API calls (like updating a database record) in agent tools when direct function calls would work
