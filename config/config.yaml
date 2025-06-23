@@ -1,1 +1,13 @@
 llm: gpt-4o-mini
+max_entities: 10
+entity_types:
+  - machine-learning-task
+  - data-modality
+  - algorithm
+  - dataset
+  - library-or-package
+  # - tool
+  # - industry
+  # - organization
+  # - application
+  # - metric

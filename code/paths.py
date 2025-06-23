@@ -12,4 +12,4 @@ CONFIG_FILE_PATH = os.path.join(CONFIG_DIR, "config.yaml")
 
 PROMPT_CONFIG_FILE_PATH = os.path.join(CONFIG_DIR, "prompt_config.yaml")
 
-PREDEFINED_ENTITIES_FILE_PATH = os.path.join(CONFIG_DIR, "predefined_entities.yaml")
+GAZETTEER_ENTITIES_FILE_PATH = os.path.join(CONFIG_DIR, "gazetteer_entities.yaml")
