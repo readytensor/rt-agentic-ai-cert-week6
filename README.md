@@ -27,9 +27,13 @@ By the end of the week, you’ll be able to:
 
 Understand the key components and patterns of agentic system design. Learn how agent teams are structured and what differentiates a multi-agent system from a single, complex agent.
 
-### Lesson 2 – Generation–Reflection Agent Loop
+### Lesson 2a – Defining the Agentic Authoring Assistant
 
-Build your first multi-agent LangGraph: a writer and a critic working together in a structured loop. Learn how agents can improve each other's outputs through feedback cycles.
+Introduce the Week 6 project: an Agentic Authoring Assistant. Define its overall goals and scope down to the tag extraction sub-project, setting the stage for implementation.
+
+### Lesson 2b – Building the Tag Extraction System
+
+Implement the tag extraction component using LangGraph. Combine traditional logic, ML models, and LLM reasoning — and explore when (and whether) agents are actually needed.
 
 ### Lesson 3 – Designing Roles and Responsibilities
 
