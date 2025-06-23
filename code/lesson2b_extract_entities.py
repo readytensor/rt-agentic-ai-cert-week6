@@ -89,8 +89,6 @@ def run_entity_extraction(
 
 if __name__ == "__main__":
 
-   
-
     # ⚠️⚠️⚠️ CAUTION: LONG + EXPENSIVE INPUTS ⚠️⚠️⚠️
     # -------------------------------------------------------------------------------
     # 🚨 Publication examples 2 and 3 are large and may take several minutes to process.
