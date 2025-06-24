@@ -4,7 +4,6 @@ This graph orchestrates three different entity extraction methods and aggregates
 """
 
 from typing import Dict, Any
-from langchain_core.messages import ToolMessage
 
 from tools import (
     extract_entities_llm,
@@ -20,56 +19,6 @@ from llm import get_llm
 config = load_config(CONFIG_FILE_PATH)
 
 MAX_ENTITIES = config.get("max_entities", 5)
-
-
-def tools_node(state: EntityExtractionState) -> Dict[str, Any]:
-    """Node that executes tool calls."""
-    tool_registry = {
-        "extract_entities_llm": extract_entities_llm,
-        "extract_entities_spacy": extract_entities_spacy,
-        "extract_entities_gazetteer": extract_entities_gazetteer,
-    }
-
-    last_message = state["messages"][-1]
-
-    tool_messages = []
-    if hasattr(last_message, "tool_calls") and last_message.tool_calls:
-        # Execute all tool calls
-        for tool_call in last_message.tool_calls:
-            result = execute_tool_call(tool_call, tool_registry)
-            # Create tool message
-            tool_message = ToolMessage(
-                content=str(result), tool_call_id=tool_call["id"]
-            )
-            tool_messages.append(tool_message)
-
-    return {"messages": tool_messages}
-
-
-def execute_tool_call(tool_call: Dict[str, Any], tool_registry: Dict[str, Any]) -> Any:
-    """Execute a single tool call and return the result."""
-    tool_name = tool_call["name"]
-    tool_args = tool_call["args"]
-
-    if tool_name in tool_registry:
-        tool_function = tool_registry[tool_name]
-        result = tool_function.invoke(tool_args)
-        print(f"🔧 Tool used: {tool_name} with args {tool_args} → Result: {result}")
-        return result
-    else:
-        print(f"Unknown tool: {tool_name}")
-        return f"Error: Tool '{tool_name}' not found"
-
-
-def should_continue(state: EntityExtractionState):
-    """Determine whether to continue to tools or end."""
-    last_message = state["messages"][-1]
-
-    # If the last message has tool calls, go to tools
-    if hasattr(last_message, "tool_calls") and last_message.tool_calls:
-        return "tools"
-    # Otherwise, we're done
-    return "aggregation"
 
 
 def llm_extraction_node(state: EntityExtractionState) -> Dict[str, Any]:
