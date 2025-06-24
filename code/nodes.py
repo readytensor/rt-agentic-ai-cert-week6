@@ -21,6 +21,7 @@ config = load_config(CONFIG_FILE_PATH)
 
 MAX_ENTITIES = config.get("max_entities", 5)
 
+
 def tools_node(state: EntityExtractionState) -> Dict[str, Any]:
     """Node that executes tool calls."""
     tool_registry = {
@@ -77,7 +78,7 @@ def llm_extraction_node(state: EntityExtractionState) -> Dict[str, Any]:
     """
     print("🤖 Running LLM-based entity extraction...")
     try:
-        entities = extract_entities_llm.func(
+        entities = extract_entities_llm(
             text=state["text"],
             entity_types=state["entity_types"],
             model_name="gpt-4o-mini",
@@ -100,7 +101,7 @@ def spacy_extraction_node(state: EntityExtractionState) -> Dict[str, Any]:
     """
     print("🔬 Running spaCy-based entity extraction...")
     try:
-        results = extract_entities_spacy.func(text=state["text"])
+        results = extract_entities_spacy(text=state["text"])
         print(f"✅ spaCy extraction completed: {len(results)} entities found")
         print("Spacy results:")
         for i, result in enumerate(results, 1):
@@ -118,7 +119,7 @@ def gazetteer_extraction_node(state: EntityExtractionState) -> Dict[str, Any]:
     """
     print("📚 Running Gazetteer entity extraction...")
     try:
-        results = extract_entities_gazetteer.func(text=state["text"])
+        results = extract_entities_gazetteer(text=state["text"])
         print(f"✅ Gazetteer extraction completed: {len(results)} entities found")
         print("Gazetteer results:")
         for i, result in enumerate(results, 1):
@@ -151,4 +152,3 @@ def aggregation_node(state: EntityExtractionState) -> Dict[str, Any]:
     ).model_dump()
 
     return {"entities": response["entities"]}
-

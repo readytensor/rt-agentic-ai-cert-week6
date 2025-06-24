@@ -3,7 +3,7 @@ from langchain_core.runnables.graph import MermaidDrawMethod
 from typing import Dict, List, Optional
 import os
 
-from nodes import(
+from nodes import (
     llm_extraction_node,
     spacy_extraction_node,
     gazetteer_extraction_node,
@@ -15,6 +15,7 @@ from paths import OUTPUTS_DIR
 from utils import load_publication_example, load_config
 
 config = load_config(CONFIG_FILE_PATH)
+
 
 def create_entity_extraction_graph() -> StateGraph:
     """
@@ -104,8 +105,8 @@ if __name__ == "__main__":
     # ✅ This project is for learning — don’t burn through tokens unnecessarily.
     # -------------------------------------------------------------------------------
 
-     # Example usage
-    sample_text = load_publication_example(1) # ⚠️ CAUTION: SEE NOTE ABOVE
+    # Example usage
+    sample_text = load_publication_example(2)  # ⚠️ CAUTION: SEE NOTE ABOVE
 
     print("=" * 80)
     print("🔍 MULTI-METHOD ENTITY EXTRACTION DEMO")
