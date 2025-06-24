@@ -1,13 +1,11 @@
 import re
 import spacy
 from typing import List, Dict, Optional
-from langchain_core.tools import tool
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from langchain_core.language_models import BaseChatModel
 import multiprocessing
-
 from llm import get_llm
 from prompt_builder import build_prompt_from_config
 from utils import load_config
@@ -59,14 +57,13 @@ def _extract_entities_from_chunk(
     return all_entities
 
 
-@tool
 def extract_entities_llm(
     text: str,
     entity_types: List[str],
     model_name: str = "gpt-4o-mini",
     chunk_size: int = 4024,
     chunk_overlap: int = 256,
-    entity_batch_size: int = 3,
+    entity_batch_size: int = 10,
     parallelize: bool = False,
     max_workers: int = max_allowed_workers,
 ) -> List[Dict[str, str]]:
@@ -109,7 +106,9 @@ def extract_entities_llm(
                         executor.submit(process_chunk_batch, chunk, batch_types)
                     )
 
-            for future in tqdm(as_completed(futures), total=len(futures), desc="LLM extraction"):
+            for future in tqdm(
+                as_completed(futures), total=len(futures), desc="LLM extraction"
+            ):
                 try:
                     results.extend(future.result())
                 except Exception as e:
@@ -126,7 +125,6 @@ def extract_entities_llm(
     return results
 
 
-@tool
 def extract_entities_spacy(
     text: str,
 ) -> List[Dict[str, str]]:
@@ -149,16 +147,17 @@ def extract_entities_spacy(
         key = (ent.text.lower(), ent.label_)
         if key not in seen:
             seen.add(key)
-            results.append({
-                "name": ent.text.lower(),
-                "type": ent.label_,
-                "method": "encoder",
-            })
+            results.append(
+                {
+                    "name": ent.text.lower(),
+                    "type": ent.label_,
+                    "method": "encoder",
+                }
+            )
 
     return results
 
 
-@tool
 def extract_entities_gazetteer(text: str) -> List[Dict[str, str]]:
     """
     Extracts unique entities from the text based on a predefined list (gazetteer).
@@ -185,11 +184,13 @@ def extract_entities_gazetteer(text: str) -> List[Dict[str, str]]:
                 key = (entity_name.lower(), entity_type)
                 if key not in seen:
                     seen.add(key)
-                    deduped_entities.append({
-                        "name": entity_name.lower(),
-                        "type": entity_type,
-                        "method": "gazetteer",
-                    })
+                    deduped_entities.append(
+                        {
+                            "name": entity_name.lower(),
+                            "type": entity_type,
+                            "method": "gazetteer",
+                        }
+                    )
         except re.error as e:
             print(f"Regex error for entity '{entity_name}': {e}")
             continue

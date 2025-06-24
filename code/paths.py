@@ -13,3 +13,5 @@ CONFIG_FILE_PATH = os.path.join(CONFIG_DIR, "config.yaml")
 PROMPT_CONFIG_FILE_PATH = os.path.join(CONFIG_DIR, "prompt_config.yaml")
 
 GAZETTEER_ENTITIES_FILE_PATH = os.path.join(CONFIG_DIR, "gazetteer_entities.yaml")
+
+MCP_SERVER_PATH = os.path.join(ROOT_DIR, "code", "lesson3_mcp.py")
