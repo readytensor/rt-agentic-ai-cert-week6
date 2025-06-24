@@ -34,7 +34,7 @@ Just like in ML, **more is not always better**. The ability to spin up a fleet o
 
 Just because you _can_ add another agent doesn’t mean you _should_.
 
-So, this week is how to **design, not demos** — **discipline, not vibes**.
+So, this week is about **design, not demos** — **discipline, not vibes**.
 
 ---
 
