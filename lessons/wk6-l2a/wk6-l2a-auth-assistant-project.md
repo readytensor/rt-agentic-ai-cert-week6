@@ -45,11 +45,11 @@ This is your chance to take what you’ve learned about agentic architectures an
 
 --DIVIDER--
 
-# ✍️ The Project: An Agentic Authoring Assistant
+# ✍️ The Project: An Agentic Authoring Assistant (A3) System
 
-At Ready Tensor, we want the process of writing and sharing AI projects to feel less like a chore — and more like a creative extension of the work itself. That means helping authors focus on their insights and innovations, while we take care of the supporting structure.
+At Ready Tensor, we want the process of writing and sharing AI projects to feel less like a chore — and more like a creative extension of the work itself. That means helping authors focus on their insights and innovations, while we take care of the supporting structure. We call it the **Agentic Authoring Assistant (A3)** system.
 
-We’re not building a system to write full publications (yet), but we _can_ assist with key elements — especially the ones that improve presentation, discoverability, and completeness.
+We’re not building the system to write full publications (yet), but we _can_ assist with key elements — especially the ones that improve presentation, discoverability, and completeness.
 
 For example:
 
