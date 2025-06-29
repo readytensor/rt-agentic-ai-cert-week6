@@ -3,14 +3,14 @@ from langchain_core.runnables.graph import MermaidDrawMethod
 from typing import Dict, List, Optional
 import os
 
-from nodes import (
+from nodes.tag_extractor_nodes import (
     llm_extraction_node,
     spacy_extraction_node,
     gazetteer_extraction_node,
     aggregation_node,
 )
 from paths import OUTPUTS_DIR, CONFIG_FILE_PATH
-from state_and_types import EntityExtractionState
+from states_types.entity_extraction import EntityExtractionState
 from paths import OUTPUTS_DIR
 from utils import load_publication_example, load_config
 

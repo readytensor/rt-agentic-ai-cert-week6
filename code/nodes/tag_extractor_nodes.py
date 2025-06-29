@@ -11,7 +11,7 @@ from tools import (
     extract_entities_gazetteer,
 )
 
-from state_and_types import EntityExtractionState, Entities
+from states_types.entity_extraction import EntityExtractionState, Entities
 from utils import load_config
 from paths import CONFIG_FILE_PATH
 from llm import get_llm

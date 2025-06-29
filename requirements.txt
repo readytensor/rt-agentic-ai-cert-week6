@@ -14,3 +14,6 @@ mcp~=1.9.4
 langchain_mcp_adapters~=0.1.7
 aiohttp~=3.10.0
 pygithub~=2.6.1
+langchain_tavily~=0.2.5
+selenium~=4.34.0
+unstructured~=0.18.1

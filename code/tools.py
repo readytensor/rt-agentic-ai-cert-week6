@@ -10,7 +10,7 @@ from llm import get_llm
 from prompt_builder import build_prompt_from_config
 from utils import load_config
 from paths import GAZETTEER_ENTITIES_FILE_PATH, PROMPT_CONFIG_FILE_PATH
-from state_and_types import Entities
+from states_types.entity_extraction import Entities
 
 # Cap max_workers between 1 and (available CPUs - 2)
 available_cpus = multiprocessing.cpu_count()

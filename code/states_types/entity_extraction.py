@@ -1,9 +1,10 @@
-
 from typing import Dict, List, TypedDict, Optional
 from pydantic import BaseModel, Field
 
+
 class EntityExtractionState(TypedDict):
     """State class for the entity extraction graph."""
+
     text: str
     entity_types: List[str]
     llm_entities: List[Dict[str, str]]
