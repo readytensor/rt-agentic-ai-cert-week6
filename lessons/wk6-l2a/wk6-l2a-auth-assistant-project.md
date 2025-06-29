@@ -6,7 +6,7 @@
 
 # TL;DR
 
-Before we dive into implementation, this lesson defines the project we’ll be building together: a multi-agent metadata assistant that generates titles, tags, summaries, images, and references for AI projects. We’ll break down its key components, outline what makes it agentic, and surface important design questions. This sets the stage for applying the architecture patterns from the previous lesson in a practical, system-level context.
+This lesson defines the Agentic Authoring Assistant (A3) project we'll be building: a system that helps authors generate metadata and supporting content for AI projects, including titles, tags, summaries, images, and references. We dive into the tag extraction subsystem as a design case study, exploring how to combine rule-based methods (gazetteer), ML models (NER), and LLM-based approaches. The key focus is on architectural decision-making: determining where agents add value versus where traditional tools and functions are more appropriate in real-world systems.
 
 ---
 

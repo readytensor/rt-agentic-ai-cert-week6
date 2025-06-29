@@ -2,6 +2,17 @@
 
 --DIVIDER--
 
+---
+
+[🏠 Home - All Lessons](https://app.readytensor.ai/hubs/ready_tensor_certifications)
+
+[⬅️ Previous - Week 6 Preview](https://app.readytensor.ai/publications/Xwoyw4yqjAGg)
+[➡️ Next - Agentic Authoring Assistant](https://app.readytensor.ai/publications/Gq1xQ27DmJ56)
+
+---
+
+--DIVIDER--
+
 # TL;DR
 
 Not every problem needs a team of agents—but when complexity demands specialization, multi-agent systems shine. In this lesson, you'll learn key building blocks, common multi-agent architectures, and the pitfalls to avoid when designing collaborative AI systems.
@@ -305,7 +316,7 @@ Not every task needs reasoning, reflection, or natural language understanding. W
 
 **Examples:**
 
-- Having an agent "decide" between two predetermined options when a simple if/else would work. This is the classic **LLM-as-Router Overkill** scenario.
+- Having an agent "decide" between two predetermined options when a simple if/else would work
 - Using an LLM to parse structured data that could be handled with regex or a simple parser
 - Prompting for arithmetic or other math operations ("What's 15% of $240?")
 - Wrapping simple API calls (like updating a database record) in agent tools when direct function calls would work
@@ -382,3 +393,14 @@ Next up, we’ll start assembling these pieces into actual agentic systems using
 > And sometimes… it's all three.
 
 You now have the vocabulary to design smart systems — not just smart agents.
+
+--DIVIDER--
+
+---
+
+[🏠 Home - All Lessons](https://app.readytensor.ai/hubs/ready_tensor_certifications)
+
+[⬅️ Previous - Week 6 Preview](https://app.readytensor.ai/publications/Xwoyw4yqjAGg)
+[➡️ Next - Agentic Authoring Assistant](https://app.readytensor.ai/publications/Gq1xQ27DmJ56)
+
+---
