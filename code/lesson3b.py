@@ -136,7 +136,8 @@ def run_content_processing(text: str) -> Dict[str, Any]:
 
 if __name__ == "__main__":
     # Example usage with a sample text
-    publication_example = load_publication_example(2)
+    publication_example_number = 2  # Can be 1, 2 or 3
+    publication_example = load_publication_example(publication_example_number)
 
     print("=" * 80)
     print("🚀 CONTENT PROCESSING WORKFLOW DEMO")
@@ -153,5 +154,21 @@ if __name__ == "__main__":
         print(f"\n\n📝 TLDR: {results.get('tldr', 'N/A')}")
         print(f"\n\n🏷️ Tags: {', '.join(results.get('tags', []))}")
         print(f"\n\n📚 References: {(results.get('references', []))}")
+
+        results_to_save = ""
+
+        results_to_save += f"# Title(s)\n\n{results.get('title', 'N/A')}\n\n"
+        results_to_save += f"# TL;DR(s)\n\n{results.get('tldr', 'N/A')}\n\n"
+        results_to_save += f"# Tags\n\n{', '.join(results.get('tags', []))}\n\n"
+        results_to_save += f"# References\n\n"
+
+        for reference in results.get("references", []):
+            results_to_save += f"- [{reference.get('title')}]({reference.get('url')})\n"
+
+        with open(
+            f"outputs/publication_example_{publication_example_number}.md", "w"
+        ) as f:
+            f.write(results_to_save)
+
     else:
         print("❌ No results generated")
