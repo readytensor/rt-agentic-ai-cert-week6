@@ -15,6 +15,9 @@ from states_types.publication_info_generator import (
 
 config = load_config(CONFIG_FILE_PATH)
 
+MAX_TLDR = 3
+MAX_TITLES = 3
+
 
 def manager_node(state: ContentProcessingState) -> Dict[str, Any]:
     """
@@ -25,15 +28,17 @@ def manager_node(state: ContentProcessingState) -> Dict[str, Any]:
     llm = get_llm(config.get("llm", "gpt-4o-mini"))
 
     prompt = f"""
-    As a content processing manager, your task is to analyze the following article and provide a comprehensive summary:
+    As a content processing manager, your task is to analyze the following project description and provide a comprehensive summary:
     
     Text: {state["text"][:500]}...
     
     Your summary should include:
-    1. The main theme of the article
-    2. Key details and insights that define the article's purpose
+    1. The main theme of the project
+    2. Key details and insights that define the project's purpose
+    3. The main goals of the project
     
     Ensure the summary is clear and aligns all nodes on the same task, providing context for subsequent processing steps.
+    The resultant summary will be used to write an article about the project.
     """
 
     response = llm.invoke(prompt)
@@ -65,6 +70,8 @@ def tldr_generator_node(state: ContentProcessingState) -> Dict[str, Any]:
     TLDR-specific feedback: {state.get("tldr_feedback", "No specific feedback")}
     
     Content: {state["text"]}
+
+    Return a list of {MAX_TLDR} different TLDRs at most.
     """
 
     tldr = llm.invoke(prompt).content
@@ -95,6 +102,8 @@ def title_generator_node(state: ContentProcessingState) -> Dict[str, Any]:
     Title-specific feedback: {state.get("title_feedback", "No specific feedback")}
     
     Content: {state["text"]}
+
+    Return a list of {MAX_TITLES} different titles at most.
     """
 
     title = llm.invoke(prompt).content
@@ -249,8 +258,8 @@ def reviewer_node(state: ContentProcessingState) -> Dict[str, Any]:
     Revision Round: {revision_round} (Max: {max_revisions})
     
     Processing Results:
-    - Title: {state.get("title", "Not generated")} [Previously approved: {state.get("title_approved", False)}]
-    - TLDR: {state.get("tldr", "Not generated")} [Previously approved: {state.get("tldr_approved", False)}]
+    - Title(s): {state.get("title", "Not generated")}
+    - TLDR(s): {state.get("tldr", "Not generated")}
     - References: {state.get("references", [])}]
     
     IMPORTANT: Only review components that haven't been previously approved. For components that were previously approved, set their approval to True and provide positive feedback.
@@ -357,35 +366,21 @@ def route_from_reviewer(
     Conditional routing function that determines whether to dispatch revisions or end.
     """
     needs_revision = state.get("needs_revision", False)
+    tldr_approved = state.get("tldr_approved", False)
+    title_approved = state.get("title_approved", False)
+    references_approved = state.get("references_approved", False)
 
     if not needs_revision:
         print("✅ All components approved - routing to END")
         return "end"
     else:
         print("🔄 Some components need revision - routing to revision dispatcher")
-        return "revision_dispatcher"
+        route_to = []
+        if not tldr_approved:
+            route_to.append("tldr_generator")
+        if not title_approved:
+            route_to.append("title_generator")
+        if not references_approved:
+            route_to.append("web_search_references_generator")
 
-
-def revision_dispatcher_node(state: ContentProcessingState) -> Dict[str, Any]:
-    """
-    Dispatcher node that coordinates parallel revision of multiple components.
-    This node examines what needs revision and prepares for parallel execution.
-    """
-    print("🎯 Revision Dispatcher: Coordinating component revisions...")
-
-    # Identify which components need revision
-    components_needing_revision = []
-    if not state.get("tldr_approved", True):
-        components_needing_revision.append("TLDR")
-    if not state.get("title_approved", True):
-        components_needing_revision.append("Title")
-    if not state.get("references_approved", True):
-        components_needing_revision.append("References")
-
-    print(
-        f"📋 Components scheduled for revision: {', '.join(components_needing_revision)}"
-    )
-    print("🚀 Dispatching revisions in parallel...")
-
-    # Return the state unchanged - the parallel execution will be handled by the graph edges
-    return {}
+        return route_to

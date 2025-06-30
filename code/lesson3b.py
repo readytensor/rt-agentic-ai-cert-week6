@@ -8,7 +8,7 @@ import os
 from typing import Dict, Any
 from langgraph.graph import StateGraph, START, END
 from langchain_core.runnables.graph import MermaidDrawMethod
-from utils import load_config
+from utils import load_config, load_publication_example
 from paths import CONFIG_FILE_PATH, OUTPUTS_DIR
 from states_types.publication_info_generator import ContentProcessingState
 from nodes.publication_info_generator_nodes import (
@@ -17,7 +17,6 @@ from nodes.publication_info_generator_nodes import (
     title_generator_node,
     tags_extractor_node,
     web_search_references_generator_node,
-    revision_dispatcher_node,
     reviewer_node,
     route_from_reviewer,
 )
@@ -45,9 +44,6 @@ def create_content_processing_graph() -> StateGraph:
         web_search_references_generator_node,
     )
 
-    # Level 2.5: Revision dispatcher (handles parallel revision coordination)
-    graph.add_node("revision_dispatcher", revision_dispatcher_node)
-
     # Level 3: Reviewer
     graph.add_node("reviewer", reviewer_node)
 
@@ -72,17 +68,13 @@ def create_content_processing_graph() -> StateGraph:
         "reviewer",
         route_from_reviewer,
         {
-            "revision_dispatcher": "revision_dispatcher",
+            "tldr_generator": "tldr_generator",
+            "title_generator": "title_generator",
+            "tags_extractor": "tags_extractor",
+            "web_search_references_generator": "web_search_references_generator",
             "end": END,
         },
     )
-
-    # Revision dispatcher routes to all level 2 nodes in parallel for revision
-    # Each node will check internally if it needs to run based on approval status
-    graph.add_edge("revision_dispatcher", "tldr_generator")
-    graph.add_edge("revision_dispatcher", "title_generator")
-    graph.add_edge("revision_dispatcher", "tags_extractor")
-    graph.add_edge("revision_dispatcher", "web_search_references_generator")
 
     return graph.compile()
 
@@ -144,22 +136,13 @@ def run_content_processing(text: str) -> Dict[str, Any]:
 
 if __name__ == "__main__":
     # Example usage with a sample text
-    sample_text = """
-    Machine learning has revolutionized artificial intelligence by enabling computers to learn 
-    from data without explicit programming. Deep learning, a subset of machine learning, 
-    uses neural networks with multiple layers to process complex patterns in data. 
-    Popular frameworks like TensorFlow and PyTorch have made it easier for researchers 
-    and practitioners to implement these algorithms. Recent advances in transformer 
-    architectures, particularly models like GPT and BERT, have shown remarkable 
-    performance in natural language processing tasks. These developments have been 
-    documented in numerous papers published in conferences like NeurIPS and ICML.
-    """
+    publication_example = load_publication_example(2)
 
     print("=" * 80)
     print("🚀 CONTENT PROCESSING WORKFLOW DEMO")
     print("=" * 80)
 
-    results = run_content_processing(text=sample_text)
+    results = run_content_processing(text=publication_example)
 
     print("\n" + "=" * 80)
     print("📋 FINAL PROCESSING RESULTS")

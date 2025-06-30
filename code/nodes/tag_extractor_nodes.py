@@ -92,6 +92,7 @@ def aggregation_node(state: EntityExtractionState) -> Dict[str, Any]:
         Extract the most important entities from the list of entities. 
         Your response should not contain more than {MAX_ENTITIES} entities. 
         Return a list of entities. Keep the format of the entity unchanged.
+        Deduplicate the entities. Do not include the same entity more than once.
 
         Entities:
         {state["llm_entities"]}
