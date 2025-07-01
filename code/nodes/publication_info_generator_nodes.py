@@ -170,13 +170,15 @@ def web_search_references_generator_node(
 
         references_summary = []
         for query in queries:
-            result = TavilySearch().invoke(query)["results"]
+            print(f"🔍 Executing query: {query}")
+            result = TavilySearch(max_results=3).invoke(query)["results"]
             references_summary.extend(result)
             print(f"✅ Successfully executed query: {query}")
 
         urls = [ref["url"] for ref in references_summary]
         loader = SeleniumURLLoader(urls=urls)
         docs = loader.load()
+        print(f"✅ Successfully loaded {len(docs)} documents")
         references_full_content = []
         for url, doc in zip(references_summary, docs[:20]):
             references_full_content.append(

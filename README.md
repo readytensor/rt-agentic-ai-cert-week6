@@ -35,9 +35,13 @@ Introduce the Week 6 project: an Agentic Authoring Assistant. Define its overall
 
 Implement the tag extraction component using LangGraph. Combine traditional logic, ML models, and LLM reasoning — and explore when (and whether) agents are actually needed.
 
-### Lesson 3 – Designing Roles and Responsibilities
+### Lesson 3a – Designing Roles and Responsibilities
 
 Explore how to define clear agent responsibilities and boundaries to reduce redundancy, improve clarity, and enable specialization in your systems.
+
+### Lesson 3b – Architectural Patterns for Multi-Agent Systems
+
+Learn how to design agentic systems that produce coherent, coordinated outputs. Explore different architectural approaches — from simple sequential chains to sophisticated coordinated systems — and understand the trade-offs between complexity, quality, and efficiency.
 
 ### Lesson 4 – Multi-Agent Research Assistant (Mini-Project)
 

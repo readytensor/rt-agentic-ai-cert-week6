@@ -24,9 +24,9 @@ from nodes.publication_info_generator_nodes import (
 config = load_config(CONFIG_FILE_PATH)
 
 
-def create_content_processing_graph() -> StateGraph:
+def create_agentic_authoring_graph() -> StateGraph:
     """
-    Creates and returns the content processing graph with hierarchical structure and feedback loop.
+    Creates and returns the agentic authoring graph with hierarchical structure and feedback loop.
     """
     # Create the graph
     graph = StateGraph(ContentProcessingState)
@@ -96,9 +96,9 @@ def visualize_graph(graph: StateGraph, save_path: str = OUTPUTS_DIR):
         print(f"⚠️ Could not save graph image: {e}")
 
 
-def run_content_processing(text: str) -> Dict[str, Any]:
+def run_agentic_authoring(text: str) -> Dict[str, Any]:
     """
-    Convenience function to run the content processing graph.
+    Convenience function to run the agentic authoring graph.
 
     Args:
         text: The text content to process
@@ -127,7 +127,7 @@ def run_content_processing(text: str) -> Dict[str, Any]:
     )
 
     # Create and run the graph
-    graph = create_content_processing_graph()
+    graph = create_agentic_authoring_graph()
     visualize_graph(graph)
     final_state = graph.invoke(initial_state)
 
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     print("🚀 CONTENT PROCESSING WORKFLOW DEMO")
     print("=" * 80)
 
-    results = run_content_processing(text=publication_example)
+    results = run_agentic_authoring(text=publication_example)
 
     print("\n" + "=" * 80)
     print("📋 FINAL PROCESSING RESULTS")
