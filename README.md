@@ -23,41 +23,33 @@ By the end of the week, you’ll be able to:
 
 ## 📚 Lessons in This Repository
 
-### Lesson 1 – Building Blocks of Multi-Agent Systems
+### Lesson 1 – [Building Blocks of Multi-Agent Systems](https://app.readytensor.ai/publications/architecting-intelligence-design-patterns-for-multi-agent-ai-systems-aaidc-week6-lesson-1-Sp2HOfRpH4Fl)
 
 Understand the key components and patterns of agentic system design. Learn how agent teams are structured and what differentiates a multi-agent system from a single, complex agent.
 
-### Lesson 2a – Defining the Agentic Authoring Assistant
+### Lesson 2a – [Defining the Agentic Authoring Assistant](https://app.readytensor.ai/publications/from-idea-to-architecture-defining-our-agentic-authoring-assistant-aaidc-week6-lesson-2-Gq1xQ27DmJ56)
 
 Introduce the Week 6 project: an Agentic Authoring Assistant. Define its overall goals and scope down to the tag extraction sub-project, setting the stage for implementation.
 
-### Lesson 2b – Building the Tag Extraction System
+### Lesson 2b – [Building the Tag Extraction System](https://app.readytensor.ai/publications/from-architecture-to-implementation-building-the-tag-extraction-system-aaidc-week6-lesson-2b-D3vJsJh1500g)
 
 Implement the tag extraction component using LangGraph. Combine traditional logic, ML models, and LLM reasoning — and explore when (and whether) agents are actually needed.
 
-### Lesson 3a – Designing Roles and Responsibilities
+### Lesson 3a – [Designing Roles and Responsibilities](https://app.readytensor.ai/publications/building-the-dream-team-designing-the-right-agents-for-the-job-aaidc-week6-lesson-3a-qtRz3uuXGx5Y)
 
 Explore how to define clear agent responsibilities and boundaries to reduce redundancy, improve clarity, and enable specialization in your systems.
 
-### Lesson 3b – Architectural Patterns for Multi-Agent Systems
+### Lesson 3b – [Architectural Patterns for Multi-Agent Systems](https://app.readytensor.ai/publications/orchestrating-intelligence-designing-agentic-systems-that-actually-work-aaidc-week6-lesson-3b-redklSjefHNo)
 
 Learn how to design agentic systems that produce coherent, coordinated outputs. Explore different architectural approaches — from simple sequential chains to sophisticated coordinated systems — and understand the trade-offs between complexity, quality, and efficiency.
 
-### Lesson 4 – Multi-Agent Research Assistant (Mini-Project)
+### Lesson 4a – [Introduction to MCP](https://app.readytensor.ai/publications/mcp-a-standard-way-for-ai-to-use-external-tools-aaidc-week6-lecture-4a-LAeGUSWv4dKb)
 
-Build a collaborative agentic system composed of three or more agents working together to explore, analyze, and summarize research content.
+Discover MCP (Model Context Protocol) — the universal standard that's doing for AI what HTTP did for the web. Learn how MCP solves integration chaos, provides built-in security, and enables AI agents to seamlessly connect with external tools and data sources through a standardized protocol.
 
-### Lesson 5 – Communication via MCP (Model Context Protocol)
+### Lesson 4b – [MCP In Action](https://app.readytensor.ai/publications/mcp-in-action-connecting-and-creating-real-ai-integrations-aaidc-week6-lesson-4b-35v0wzEbKZBo)
 
-Learn how agents can talk to external systems and each other over a shared protocol. See how to structure flexible, interoperable agent interfaces.
-
-### Lesson 6 – Real-World Issues: Debugging, Conflicts, and Resilience
-
-Study common pitfalls in multi-agent designs: tool contention, inconsistent outputs, communication failures — and how to design systems that recover gracefully.
-
-### Lesson 7 – Production-Aware Multi-Agent System (Capstone Example)
-
-Walk through a full-featured multi-agent application with robust design patterns, fallback behaviors, and observability baked in — the kind of architecture you’ll aim for in your Week 8 project.
+Go from MCP theory to practice. Learn how to connect your AI to existing MCP servers (like GitHub, file systems, and databases) and build your own custom MCP server from scratch. Includes hands-on code walkthroughs and real-world integration examples.
 
 ---
 
