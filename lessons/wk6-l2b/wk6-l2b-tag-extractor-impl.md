@@ -1,4 +1,4 @@
-![AAIDC-wk6-l2b-tag-extractor-impl.jpeg](AAIDC-wk6-l2b-tag-extractor-impl.jpeg)
+![AAIDC-wk6-l2b-tag-extractor-impl-v3.jpeg](AAIDC-wk6-l2b-tag-extractor-impl-v3.jpeg)
 
 --DIVIDER--
 
