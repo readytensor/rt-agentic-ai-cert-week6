@@ -2,7 +2,7 @@ from typing import Dict, Any, Literal
 from lesson2b_extract_entities import run_entity_extraction
 from llm import get_llm
 from utils import load_config
-from paths import CONFIG_FILE_PATH
+from paths import CONFIG_FILE_PATH, PROMPT_CONFIG_FILE_PATH
 from langchain_tavily import TavilySearch
 from langchain_community.document_loaders import SeleniumURLLoader
 from states_types.publication_info_generator import (
@@ -15,6 +15,7 @@ from prompt_builder import build_prompt_from_config
 
 
 config = load_config(CONFIG_FILE_PATH)
+prompt_config = load_config(PROMPT_CONFIG_FILE_PATH)
 
 MAX_TLDR = 3
 MAX_TITLES = 3
@@ -28,19 +29,9 @@ def manager_node(state: ContentProcessingState) -> Dict[str, Any]:
 
     llm = get_llm(config.get("llm", "gpt-4o-mini"))
 
-    prompt = f"""
-    As a content processing manager, your task is to analyze the following project description and provide a comprehensive summary:
-    
-    Text: {state["text"][:500]}...
-    
-    Your summary should include:
-    1. The main theme of the project
-    2. Key details and insights that define the project's purpose
-    3. The main goals of the project
-    
-    Ensure the summary is clear and aligns all nodes on the same task, providing context for subsequent processing steps.
-    The resultant summary will be used to write an article about the project.
-    """
+    prompt = build_prompt_from_config(
+        config=prompt_config["manager_analysis"], input_data=state["text"]
+    )
 
     response = llm.invoke(prompt)
     decision = response.content
@@ -61,19 +52,18 @@ def tldr_generator_node(state: ContentProcessingState) -> Dict[str, Any]:
 
     llm = get_llm(config.get("llm", "gpt-4o-mini"))
 
-    prompt = f"""
-    Create a concise TLDR (Too Long; Didn't Read) summary of the following content.
-    The summary should be 2-3 sentences that capture the main points and key insights.
-    
+    # Build context information
+    context_info = f"""
     Manager's guidance: {state.get("manager_decision", "No specific guidance")}
-
-    If the reviewer has provided specific feedback for TLDR improvement, incorporate it:
     TLDR-specific feedback: {state.get("tldr_feedback", "No specific feedback")}
-    
-    Content: {state["text"]}
-
-    Return a list of {MAX_TLDR} different TLDRs at most.
+    Generate a list of {MAX_TLDR} different TLDRs at most.
     """
+
+    # Get the prompt config and add context
+    tldr_config = prompt_config["tldr_generation"].copy()
+    tldr_config["context"] = context_info
+
+    prompt = build_prompt_from_config(config=tldr_config, input_data=state["text"])
 
     tldr = llm.invoke(prompt).content
     print(f"✅ TLDR generated: {tldr[:100]}...")
@@ -93,19 +83,18 @@ def title_generator_node(state: ContentProcessingState) -> Dict[str, Any]:
 
     llm = get_llm(config.get("llm", "gpt-4o-mini"))
 
-    prompt = f"""
-    Generate an engaging and descriptive title for the following content.
-    The title should be clear, concise, and capture the essence of the content.
-    
+    # Build context information
+    context_info = f"""
     Manager's guidance: {state.get("manager_decision", "No specific guidance")}
-
-    If the reviewer has provided specific feedback for title improvement, incorporate it:
     Title-specific feedback: {state.get("title_feedback", "No specific feedback")}
-    
-    Content: {state["text"]}
-
-    Return a list of {MAX_TITLES} different titles at most.
+    Generate a list of {MAX_TITLES} different titles at most.
     """
+
+    # Get the prompt config and add context
+    title_config = prompt_config["title_generation"].copy()
+    title_config["context"] = context_info
+
+    prompt = build_prompt_from_config(config=title_config, input_data=state["text"])
 
     title = llm.invoke(prompt).content
     print(f"✅ Title generated: {title}")
@@ -152,18 +141,17 @@ def web_search_references_generator_node(
         SearchQueries
     )
 
-    prompt = f"""
+    # Build context information for search queries
+    context_info = f"""
     Manager's guidance: {state.get("manager_decision", "No specific guidance")}
-    
-    Provide a list of search queries to find relevant references for the following content.
-    
-    If the reviewer has provided specific feedback for references improvement, incorporate it:
     References-specific feedback: {state.get("references_feedback", "No specific feedback")}
-
-    The list should not contain more than 5 elements.
-    
-    Content: {state["text"]}
     """
+
+    # Get the prompt config and add context
+    search_config = prompt_config["search_queries_generation"].copy()
+    search_config["context"] = context_info
+
+    prompt = build_prompt_from_config(config=search_config, input_data=state["text"])
 
     try:
         queries = llm.invoke(prompt).queries
@@ -194,35 +182,25 @@ def web_search_references_generator_node(
         )
         print("📚 References Selector: Selecting references...")
 
-        prompt = f"""
-        Select the most relevant references from the following content.
-
-        Manager's guidance: {state.get("manager_decision", "No specific guidance")}
-
+        # Build input data for reference selection
+        reference_input = f"""
         Content: {state["text"]}
 
         References: {references_full_content}
-
-        Return a list of references with the following format:
-        [
-            (
-                "url": "https://example.com",
-                "title": "The title of the reference"
-            ),
-        ]
-
-        For example:
-        [
-            (
-                "url": "https://langchain-ai.github.io/langgraph/",
-                "title": "LangGraph: A framework for building LLM applications"
-            ),
-            (
-                "url": "https://arxiv.org/abs/1706.03762",
-                "title": "Vaswani, et al. 'Attention is all you need.' Advances in neural information processing systems 30 (2017)."
-            )
-        ]
         """
+
+        # Build context information for reference selection
+        selection_context_info = f"""
+        Manager's guidance: {state.get("manager_decision", "No specific guidance")}
+        """
+
+        # Get the prompt config and add context
+        selection_config = prompt_config["reference_selection"].copy()
+        selection_config["context"] = selection_context_info
+
+        prompt = build_prompt_from_config(
+            config=selection_config, input_data=reference_input
+        )
 
         result = llm.invoke(prompt).references
         selected_references = []
@@ -253,9 +231,8 @@ def reviewer_node(state: ContentProcessingState) -> Dict[str, Any]:
 
     llm = get_llm(config.get("llm", "gpt-4o-mini")).with_structured_output(ReviewOutput)
 
-    prompt = f"""
-    Review the following content processing results for quality and completeness:
-    
+    # Build comprehensive input data for review
+    review_input = f"""
     Original Content Length: {len(state["text"])} characters
     Manager's Decision: {state.get("manager_decision", "N/A")}
     Revision Round: {revision_round} (Max: {max_revisions})
@@ -263,28 +240,12 @@ def reviewer_node(state: ContentProcessingState) -> Dict[str, Any]:
     Processing Results:
     - Title(s): {state.get("title", "Not generated")}
     - TLDR(s): {state.get("tldr", "Not generated")}
-    - References: {state.get("references", [])}]
-    
-    IMPORTANT: Only review components that haven't been previously approved. For components that were previously approved, set their approval to True and provide positive feedback.
-    
-    Evaluate each component individually:
-    
-    1. TITLE: Is it engaging, accurate, and captures the essence of the content?
-    2. TLDR: Is it concise yet comprehensive, capturing main points?
-    3. TAGS: Are they relevant, comprehensive, and properly categorized?
-    4. REFERENCES: Are they appropriate, useful, and complete?
-    
-    For each component, provide:
-    - Whether it should be approved (True/False)
-    - Specific feedback explaining your decision
-    - If not approved, clear guidance on what needs to be improved
-        
-    Provide for each component:
-    - Individual approval status (tldr_approved, title_approved, references_approved)
-    - Individual feedback (tldr_feedback, title_feedback, references_feedback)
-    - General feedback summary
-    - List of suggestions for improvement
+    - References: {state.get("references", [])}
     """
+
+    prompt = build_prompt_from_config(
+        config=prompt_config["content_review"], input_data=review_input
+    )
 
     try:
         response = llm.invoke(prompt)
