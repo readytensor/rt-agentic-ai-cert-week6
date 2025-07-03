@@ -11,6 +11,7 @@ from states_types.publication_info_generator import (
     References,
     SearchQueries,
 )
+from prompt_builder import build_prompt_from_config
 
 
 config = load_config(CONFIG_FILE_PATH)
