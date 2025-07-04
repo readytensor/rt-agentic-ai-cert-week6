@@ -1,12 +1,25 @@
 ![AAIDC-wk6-l3b-designing-agentic-systems.jpeg](AAIDC-wk6-l3b-designing-agentic-systems.jpeg)
 
-
-# TL;DR
-
-Great agents are only half the equation — the real challenge is making them work together as a coherent system. In this lesson, we’ll walk through practical architectural considerations for designing AI systems like our Agentic Authoring Assistant (A3). You’ll learn how to coordinate outputs, ensure quality, handle partial failures, support human-in-the-loop workflows, and design modular yet cohesive systems — all without overcomplicating your graph.
+--DIVIDER--
 
 ---
 
+[🏠 Home - All Lessons](https://app.readytensor.ai/hubs/ready_tensor_certifications)
+
+[⬅️ Previous - Designing Right Agents](https://app.readytensor.ai/publications/qtRz3uuXGx5Y)
+[➡️ Next - Introducing MCP](https://app.readytensor.ai/publications/LAeGUSWv4dKb)
+
+---
+
+--DIVIDER--
+
+# TL;DR
+
+Great agents are only half the equation — the real challenge is making them work together as a coherent system. In this lesson, we’ll walk through practical architectural considerations for designing AI systems like our Agentic Authoring Assistant (A3). You’ll learn how to coordinate outputs, ensure quality, handle partial failures, support human-in-the-loop workflows, and design modular yet cohesive systems — while keeping your agentic graphs clean and maintainable.
+
+---
+
+--DIVIDER--
 
 # 🚨 When Good Agents Go Rogue
 
@@ -19,8 +32,9 @@ So what’s next?
 You might think:
 “Let’s build the other parts the same way — give each its own graph, chain them together, and we’re done.”
 
-*Seems reasonable. Until you see the output.*
+_Seems reasonable. Until you see the output._
 
+--DIVIDER--
 
 # 🤨 The Problem With “Just Chaining”
 
@@ -38,16 +52,17 @@ The tags emphasize the task category and methods with no mention of LLMs.
 The tl;dr blends everything.
 The references include some loosely related work.
 
-Each component did its job. But the system is incongruent.
+Each component did its job — but the system didn’t hold together.
 
 Why?
 
-Because no one is coordinating.
+Because there’s no shared plan.
 No one is reviewing the full picture.
 No one checking if the pieces made sense together.
 
 ---
 
+--DIVIDER--
 
 # 🔍 And That’s Just the Happy Path Problem
 
@@ -67,6 +82,7 @@ And if we don’t design for them now, we’ll end up duct-taping fixes later.
 
 ---
 
+--DIVIDER--
 
 # 🧠 What This Lesson Is Really About
 
@@ -74,11 +90,13 @@ You’ve built capable agents. That’s the easy part.
 
 Now it’s time to make them work as a system — consistent, resilient, and modular.
 
-Not just agents that run... 
+Not just agents that run...
 
 but agents that work together.
 
 ---
+
+--DIVIDER--
 
 # 🧩 Four Key Considerations for Agentic System Design
 
@@ -100,7 +118,7 @@ But users need consistency. They want the title, tags, and TLDR to feel like the
 
 This is where meta-level coordination becomes critical. We need mechanisms that ensure outputs align not just individually but collectively. Think of it as the difference between having four talented musicians playing their parts perfectly versus having them play together as a quartet.
 
-## Consideration 2: System and Component Failures
+## Consideration 2: Failure Handling
 
 What happens when things go wrong?
 
@@ -112,7 +130,7 @@ Do we retry? How many times? Do we have fallback agents? Do we return partial re
 
 Consider our A3 system: if the reference generator fails, should we return a publication package without references? Or should we halt the entire process? The answer depends on your users' needs and your system's requirements.
 
-## Consideration 3: Bad Input Handling
+## Consideration 3: Input Robustness
 
 What do you do when users give you bad inputs?
 
@@ -126,7 +144,7 @@ Do we try to process everything and let users decide if the output is useful? Do
 
 These decisions shape the user experience. Too strict, and you frustrate users with valid but edge-case content. Too lenient, and you waste compute on impossible requests.
 
-## Consideration 4: Human in the Loop
+## Consideration 4: Human Feedback & Control
 
 How much do you want humans involved in the process?
 
@@ -140,6 +158,8 @@ This consideration affects not just the user interface but the entire system arc
 
 ---
 
+--DIVIDER--
+
 ## What We'll Focus on in This Lesson
 
 Now, while all four considerations are important for production systems, this lesson will primarily focus on **Consideration 1: Quality of Output**. We're building for the happy path — designing architectures that produce coherent, consistent results when everything works as intended.
@@ -150,6 +170,7 @@ Now, while all four considerations are important for production systems, this le
 
 So for now, let's focus on the architectural challenge of making independent agents work together harmoniously.
 
+--DIVIDER--
 
 # 🏗️ Architectural Approaches
 
@@ -208,13 +229,27 @@ This approach gives you coordinated execution with efficient feedback loops. Par
 
 However, this approach isn't without its challenges. Managing state becomes increasingly intricate. Implementing advanced routing logic is essential to efficiently manage selective re-executions. Additionally, troubleshooting parallel processes with partial failures presents a unique set of difficulties.
 
+--DIVIDER--
 
 # ✅ Wrapping Up
 
 This lesson walked through the critical transition from building individual capable agents to orchestrating them into coherent systems. We explored four key considerations that shape architectural decisions — output quality, system resilience, input handling, and human interaction — then examined how different approaches handle these trade-offs.
 
-The big insight? **Architecture isn't just about implementation — it's about behavior.** 
+The big insight? **Architecture isn't just about implementation — it's about behavior.**
 
 Simple chains produce independent outputs. End reviewers catch problems but create expensive loops. Coordinated systems with managers and targeted feedback enable consistency without waste. Each approach naturally leads to different outcomes.
 
 For our A3 system, we chose the coordinated multi-agent approach because it aligns with what we actually care about: consistent, high-quality outputs that feel like they belong together, with the flexibility to evolve as our understanding deepens.
+
+--DIVIDER--
+
+---
+
+[🏠 Home - All Lessons](https://app.readytensor.ai/hubs/ready_tensor_certifications)
+
+[⬅️ Previous - Designing Right Agents](https://app.readytensor.ai/publications/qtRz3uuXGx5Y)
+[➡️ Next - Introducing MCP](https://app.readytensor.ai/publications/LAeGUSWv4dKb)
+
+---
+
+--DIVIDER--
