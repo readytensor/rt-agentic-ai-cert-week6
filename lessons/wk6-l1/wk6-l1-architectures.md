@@ -33,7 +33,9 @@ Today, in the age of agentic AI, there’s a new kind of brag:
 
 But here’s the question we _should_ be asking more often:
 
-> **Did you need that much complexity?** > **Did you try something simpler first?** > **How did you decide on that architecture?**
+> **Did you need that much complexity?**  
+> **Did you try something simpler first?**  
+> **How did you decide on that architecture?**
 
 Just like in ML, **more is not always better**. The ability to spin up a fleet of agents with frameworks such as CrewAI or LangGraph in just a few lines of code is empowering — but also dangerously tempting. Without thoughtful design, you end up with systems that are:
 
