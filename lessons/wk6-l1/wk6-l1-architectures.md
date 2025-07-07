@@ -301,6 +301,12 @@ Even with great patterns, things can go wrong. These common pitfalls lead to bri
 Designing a single agent to handle everything.
 This creates a **Swiss Army Knife Agent** — overloaded and underperforming. It lacks clarity, makes debugging harder, and breaks down under pressure. Give each agent a clear, focused role. Think **Single Responsibility Principle**.
 
+**Examples:**
+
+- A single agent responsible for both data collection and analysis
+- An agent that handles user queries, generates reports, and manages notifications
+- A research agent that searches the internet, summarizes findings, and writes code
+
 ---
 
 ### 🧱 Death by a Thousand Agents
