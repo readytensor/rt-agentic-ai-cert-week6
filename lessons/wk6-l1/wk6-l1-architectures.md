@@ -296,6 +296,10 @@ Even with great patterns, things can go wrong. These common pitfalls lead to bri
 
 --DIVIDER--
 
+![antipatterns.png](antipatterns.png)
+
+--DIVIDER--
+
 ### 🧰 One Agent to Rule Them All
 
 Designing a single agent to handle everything.
