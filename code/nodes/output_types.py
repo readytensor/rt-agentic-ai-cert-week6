@@ -1,26 +1,17 @@
-from typing import List, Optional, TypedDict
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
+class Entity(BaseModel):
+    name: str = Field(description="The entity name")
+    type: Optional[str] = Field(
+        description="The entity type or 'Other' if not confidently classified."
+    )
 
-class ContentProcessingState(TypedDict):
-    """State class for the content processing graph."""
 
-    text: str
-    tldr: Optional[str]
-    title: Optional[str]
-    tags: Optional[List[str]]
-    references: Optional[List[str]]
-    manager_decision: Optional[str]
-    revision_round: Optional[int]
-    needs_revision: Optional[bool]
-    # Individual feedback for each level 2 node
-    tldr_feedback: Optional[str]
-    title_feedback: Optional[str]
-    references_feedback: Optional[str]
-    # Individual approval status for each component
-    tldr_approved: Optional[bool]
-    title_approved: Optional[bool]
-    references_approved: Optional[bool]
+class Entities(BaseModel):
+    entities: List[Entity] = Field(
+        description="The extracted entities. Can be empty if no entities are found.",
+    )
 
 
 class SearchQueries(BaseModel):
@@ -32,6 +23,7 @@ class SearchQueries(BaseModel):
 class Reference(BaseModel):
     url: str = Field(description="The URL of the reference")
     title: str = Field(description="The title of the reference")
+    page_content: str = Field(description="The content of the reference page")
 
 
 class References(BaseModel):
