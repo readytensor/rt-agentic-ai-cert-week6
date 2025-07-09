@@ -123,7 +123,7 @@ a3_system:
   max_tags: 10
   max_search_queries: 4
   max_references: 15
-  max_revisions: 1
+  max_revisions: 2
   tag_types:
     - name: task
       description: A machine learning or AI objective (e.g., text classification, image generation)

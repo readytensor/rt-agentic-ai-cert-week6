@@ -1,20 +1,16 @@
-from typing import Any, Callable, Dict, Optional, Tuple, Union, TypedDict
-from langchain_core.messages import BaseMessage, HumanMessage
+from typing import Any, Dict
 from langgraph.graph import StateGraph, START, END
 
 
 from consts import (
     MANAGER,
-    LLM_TAGS_GENERATOR,
-    TAG_TYPE_ASSIGNER,
-    TAGS_SELECTOR,
     TLDR_GENERATOR,
     TITLE_GENERATOR,
     REFERENCES_GENERATOR,
     REFERENCES_SELECTOR,
     REVIEWER,
 )
-from states.a3_state import A3SystemState, initialize_a3_state
+from states.a3_state import A3SystemState
 from graphs.tag_generation_graph import add_tag_generation_flow
 from nodes.a3_nodes import (
     make_manager_node,
@@ -22,7 +18,8 @@ from nodes.a3_nodes import (
     make_tldr_generator_node,
     make_references_generator_node,
     make_references_selector_node,
-    make_reviewer_node
+    make_reviewer_node,
+    route_from_reviewer,
 )
 
 
@@ -58,7 +55,7 @@ def build_a3_graph(a3_config: Dict[str, Any]) -> StateGraph:
         llm_model=a3_config["agents"][REFERENCES_SELECTOR]["llm"]
     )
     graph.add_node(REFERENCES_SELECTOR, references_selector_node)
-    
+
     # Add reviewer node
     reviewer_node = make_reviewer_node(llm_model=a3_config["agents"][REVIEWER]["llm"])
     graph.add_node(REVIEWER, reviewer_node)
@@ -72,7 +69,7 @@ def build_a3_graph(a3_config: Dict[str, Any]) -> StateGraph:
     graph.add_edge(MANAGER, TLDR_GENERATOR)
     graph.add_edge(MANAGER, REFERENCES_GENERATOR)
     graph.add_edge(REFERENCES_GENERATOR, REFERENCES_SELECTOR)
-    
+
     # Add tag generation flow
     tag_gen_exit_node = add_tag_generation_flow(
         graph=graph,
@@ -80,10 +77,18 @@ def build_a3_graph(a3_config: Dict[str, Any]) -> StateGraph:
         tag_generation_config=a3_config,
     )
 
-    graph.add_edge(TITLE_GENERATOR, REVIEWER)
-    graph.add_edge(TLDR_GENERATOR, REVIEWER)
     graph.add_edge(tag_gen_exit_node, END)
-    graph.add_edge(REFERENCES_SELECTOR, REVIEWER)
-    graph.add_edge(REVIEWER, END)
+    graph.add_edge([TITLE_GENERATOR, TLDR_GENERATOR, REFERENCES_SELECTOR], REVIEWER)
+
+    graph.add_conditional_edges(
+        REVIEWER,
+        route_from_reviewer,
+        {
+            TLDR_GENERATOR: TLDR_GENERATOR,
+            TITLE_GENERATOR: TITLE_GENERATOR,
+            REFERENCES_GENERATOR: REFERENCES_GENERATOR,
+            "end": END,
+        },
+    )
 
     return graph.compile()

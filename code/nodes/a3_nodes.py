@@ -1,13 +1,11 @@
 from typing import Any, Callable, Dict, Literal
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage
 from langchain_tavily import TavilySearch
-from langchain_community.document_loaders import SeleniumURLLoader
 
 from states.a3_state import A3SystemState
 from llm import get_llm
 
 from consts import (
-    INPUT_TEXT,
     MANAGER_MESSAGES,
     MANAGER_BRIEF,
     SELECTED_REFERENCES,
@@ -27,7 +25,6 @@ from consts import (
     REVIEWER_MESSAGES,
     MAX_REVISIONS,
     REVISION_ROUND,
-    SELECTED_TAGS,
     NEEDS_REVISION,
     TLDR_APPROVED,
     TITLE_APPROVED,
@@ -35,6 +32,9 @@ from consts import (
     TITLE_FEEDBACK,
     TLDR_FEEDBACK,
     REFERENCES_FEEDBACK,
+    REFERENCES_GENERATOR,
+    TITLE_GENERATOR,
+    TLDR_GENERATOR,
 )
 from .output_types import SearchQueries, References, ReviewOutput
 
@@ -83,21 +83,24 @@ def make_title_generator_node(
         if state[TITLE_APPROVED] is True:
             print("🎯 Title Generator: Already approved, skipping...")
             return {}
-        
+
         print("🎯 Title Generator: Creating title...")
         messages = state[TITLE_GEN_MESSAGES]
         reviewer_message = HumanMessage(
             f"Following is the review from your reviewer:\n\n {state.get(TITLE_FEEDBACK, "No feedback provided")}\n\n"
         )
-        messages += [reviewer_message] + \
-            [HumanMessage("Proceed with your title generation using latest feedback (if any).")]
+        messages += [reviewer_message] + [
+            HumanMessage(
+                "Proceed with your title generation using latest feedback (if any)."
+            )
+        ]
         ai_response = llm.invoke(messages)
         content = ai_response.content.strip()
 
         return {
-            TITLE_GEN_MESSAGES: [messages[-1], 
-            ai_response], TITLE: content,
-            TITLE_FEEDBACK: ""
+            TITLE_GEN_MESSAGES: [messages[-1], ai_response],
+            TITLE: content,
+            TITLE_FEEDBACK: "",
         }
 
     return title_generator_node
@@ -125,7 +128,9 @@ def make_tldr_generator_node(
         )
         messages = state[TLDR_GEN_MESSAGES] + [
             reviewer_message,
-            HumanMessage("Proceed with your TL;DR generation using latest feedback (if any).")
+            HumanMessage(
+                "Proceed with your TL;DR generation using latest feedback (if any)."
+            ),
         ]
         ai_response = llm.invoke(messages)
         content = ai_response.content.strip()
@@ -151,7 +156,7 @@ def make_references_generator_node(
         if state.get(REFERENCES_APPROVED, False):
             print("📚 References Generator: Already approved, skipping...")
             return {}
-        
+
         print("📚 References Generator: Extracting references...")
         reviewer_message = HumanMessage(
             "Following is the review from your reviewer:\n"
@@ -159,7 +164,9 @@ def make_references_generator_node(
         )
         messages = state[REFERENCES_GEN_MESSAGES] + [
             reviewer_message,
-            HumanMessage("Proceed with your search query generation using latest feedback (if any).")
+            HumanMessage(
+                "Proceed with your search query generation using latest feedback (if any)."
+            ),
         ]
         try:
             queries = llm.with_structured_output(SearchQueries).invoke(messages).queries
@@ -168,36 +175,42 @@ def make_references_generator_node(
             search_results = []
             for query in queries:
                 print(f"🔍 Executing query: {query}")
-                result = TavilySearch(max_results=3).invoke(query)["results"]
+                try:
+                    result = TavilySearch(max_results=3).invoke(query)["results"]
+                except Exception as e:
+                    print(f"❌ Error executing query: {e}")
+                    continue
                 search_results.extend(result)
                 print(f"✅ Successfully executed query: {query}")
 
-            candidate_references= [
+            candidate_references = [
                 {
-                    "url": search_result['url'],
-                    "title": search_result['title'],
-                    "page_content": search_result['content'],
-                } for search_result in search_results
-                if search_result['content']  # Ensure content is not empty
+                    "url": search_result["url"],
+                    "title": search_result["title"],
+                    "page_content": search_result["content"],
+                }
+                for search_result in search_results
+                if search_result["content"]  # Ensure content is not empty
             ]
 
             formatted_references = "\n\n".join(
                 f"- Title: {ref['title']}\n  URL: {ref['url']}\n  Content:\n{ref.get('page_content', '')[:5000]}"
                 for ref in candidate_references
             )
-            message_to_selector = HumanMessage(f"Here are the candidate references:\n\n{formatted_references}")
+            message_to_selector = HumanMessage(
+                f"Here are the candidate references:\n\n{formatted_references}"
+            )
             return {
                 REFERENCES_GEN_MESSAGES: [messages[-1]],
                 REFERENCE_SEARCH_QUERIES: queries,
                 CANDIDATE_REFERENCES: candidate_references,
-                REFERENCES_SELECTOR_MESSAGES: [message_to_selector]
+                REFERENCES_SELECTOR_MESSAGES: [message_to_selector],
             }
         except Exception as e:
             print(f"❌ References extraction failed: {e}")
             raise RuntimeError(
                 "References extraction failed. Please check your LLM configuration or input text."
             ) from e
-
 
     return references_generator_node
 
@@ -209,6 +222,7 @@ def make_references_selector_node(
     Returns a LangGraph-compatible node that wraps a references selector.
     """
     llm = get_llm(llm_model)
+
     def references_selector_node(state: A3SystemState) -> Dict[str, Any]:
         """
         References selector node that processes the input text and selects references.
@@ -216,13 +230,17 @@ def make_references_selector_node(
         if state.get(REFERENCES_APPROVED, False):
             print("📚 References Selector: Already approved, skipping...")
             return {}
-        
+
         print("📚 References Selector: Selecting references...")
 
         messages = state[REFERENCES_SELECTOR_MESSAGES] + [
-            HumanMessage("Proceed with your references selection using latest feedback (if any)."),
+            HumanMessage(
+                "Proceed with your references selection using latest feedback (if any)."
+            ),
         ]
-        selected_references = llm.with_structured_output(References).invoke(messages).references
+        selected_references = (
+            llm.with_structured_output(References).invoke(messages).references
+        )
         selected_references = [
             {
                 "url": ref.url,
@@ -257,7 +275,9 @@ def make_reviewer_node(
         max_revisions = state[MAX_REVISIONS]
         if revision_round >= max_revisions:
             overall_approved = True  # Force approve all remaining components
-            print("🔒 Reviewer: Maximum revisions reached, forcing approval for all components.")
+            print(
+                "🔒 Reviewer: Maximum revisions reached, forcing approval for all components."
+            )
             return {
                 NEEDS_REVISION: False,
                 TITLE_APPROVED: True,
@@ -274,7 +294,6 @@ def make_reviewer_node(
             for ref in selected_references
         )
 
-        
         # Build comprehensive input data for review
         review_input = f"""
         # Title(s):\n {title} \n ------------- \n
@@ -291,7 +310,11 @@ def make_reviewer_node(
         revision_round += 1
 
         # Handle individual component approvals
-        overall_approved = response.title_approved and response.tldr_approved and response.references_approved
+        overall_approved = (
+            response.title_approved
+            and response.tldr_approved
+            and response.references_approved
+        )
 
         print(f"✅ Review completed: approved = {overall_approved}")
         print(f"📋 Feedback: {response.model_dump()}")
@@ -349,21 +372,10 @@ def route_from_reviewer(
     Conditional routing function that determines whether to dispatch revisions or end.
     """
     needs_revision = state.get(NEEDS_REVISION, False)
-    tldr_approved = state.get("tldr_approved", False)
-    title_approved = state.get("title_approved", False)
-    references_approved = state.get("references_approved", False)
 
     if not needs_revision:
         print("✅ All components approved - routing to END")
         return "end"
     else:
         print("🔄 Some components need revision - routing to revision dispatcher")
-        route_to = []
-        if not tldr_approved:
-            route_to.append("tldr_generator")
-        if not title_approved:
-            route_to.append("title_generator")
-        if not references_approved:
-            route_to.append("web_search_references_generator")
-
-        return route_to
+        return [TLDR_GENERATOR, TITLE_GENERATOR, REFERENCES_GENERATOR]

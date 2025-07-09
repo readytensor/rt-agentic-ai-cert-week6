@@ -83,9 +83,10 @@ def add_tag_generation_flow(
     graph.add_edge(SPACY_TAGS_GENERATOR, TAG_TYPE_ASSIGNER)
     graph.add_edge(entry_node, GAZETTEER_TAGS_GENERATOR)
 
-    graph.add_edge(LLM_TAGS_GENERATOR, TAGS_AGGREGATOR)
-    graph.add_edge(TAG_TYPE_ASSIGNER, TAGS_AGGREGATOR)
-    graph.add_edge(GAZETTEER_TAGS_GENERATOR, TAGS_AGGREGATOR)
+    graph.add_edge(
+        [LLM_TAGS_GENERATOR, TAG_TYPE_ASSIGNER, GAZETTEER_TAGS_GENERATOR],
+        TAGS_AGGREGATOR,
+    )
 
     graph.add_edge(TAGS_AGGREGATOR, TAGS_SELECTOR)
 
