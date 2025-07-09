@@ -1,6 +1,20 @@
-variational auto-encoders: model
+variational auto-encoders: algorithm
 mnist: dataset
 anomaly detection: task
-pytorch: framework
-gan: model
-
+pytorch: tool-or-framework
+gan: algorithm
+cifar-10: dataset
+sentiment analysis: task
+hugging face: tool-or-framework
+transformer: algorithm
+image generation: task
+scikit-learn: tool-or-framework
+cohere: tool-or-framework
+uci heart disease: dataset
+legal document classification: use-case
+fraud detection: use-case
+langchain: tool-or-framework
+text summarization: task
+decision tree: algorithm
+coco captions: dataset
+medical image diagnosis: use-case

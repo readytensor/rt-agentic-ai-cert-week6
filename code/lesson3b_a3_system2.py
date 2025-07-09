@@ -103,7 +103,11 @@ if __name__ == "__main__":
     pprint(response["reference_search_queries"])
     print("=" * 80)
     print("References:")
-    pprint(response["selected_references"])
+    print("Selected # of references:", len(response["selected_references"]))
+    for ref in response["selected_references"]:
+        print(f"Title: {ref['title']}")
+        print(f"URL: {ref['url']}")
+        print("-" * 40)
     print("=" * 80)
 
     # # Example usage

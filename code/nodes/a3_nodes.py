@@ -194,7 +194,10 @@ def make_references_generator_node(
             }
         except Exception as e:
             print(f"❌ References extraction failed: {e}")
-            return {}
+            raise RuntimeError(
+                "References extraction failed. Please check your LLM configuration or input text."
+            ) from e
+
 
     return references_generator_node
 
@@ -270,12 +273,13 @@ def make_reviewer_node(
             f"- Title: {ref['title']}\n  URL: {ref['url']}\n  Content:\n{ref.get('page_content', '')[:5000]}"
             for ref in selected_references
         )
+
         
         # Build comprehensive input data for review
         review_input = f"""
         # Title(s):\n {title} \n ------------- \n
         # TLDR(s):\n {tldr} \n ------------- \n
-        # References:\n {formatted_references}) \n ------------- \n
+        # References:\n {formatted_references} \n ------------- \n
         """
         messages = state[REVIEWER_MESSAGES] + [
             HumanMessage(
