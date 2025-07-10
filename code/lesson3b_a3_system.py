@@ -16,7 +16,6 @@ from consts import (
     REFERENCES_GENERATOR,
     REFERENCES_SELECTOR,
     REVIEWER,
-    MAX_REVISIONS,
 )
 
 
@@ -58,7 +57,6 @@ def run_a3_graph(text: str) -> Dict[str, Any]:
     # # Build the graph
     graph = build_a3_graph(a3_config)
     save_graph_visualization(graph, graph_name="a3_system")
-    # exit()
 
     # Run the graph
     final_state = graph.invoke(initial_state)
@@ -109,10 +107,3 @@ if __name__ == "__main__":
         print(f"URL: {ref['url']}")
         print("-" * 40)
     print("=" * 80)
-
-    # # Example usage
-    # graph_config = load_config(os.path.join(CONFIG_DIR, "a3_graph_config.yaml"))
-    # text = "Sample text for A3 system processing."
-
-    # final_state = run_a3_graph(graph_config, text)
-    # print(final_state)

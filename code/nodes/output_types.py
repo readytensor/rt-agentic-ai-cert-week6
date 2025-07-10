@@ -1,6 +1,7 @@
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
+
 class Entity(BaseModel):
     name: str = Field(description="The entity name")
     type: Optional[str] = Field(

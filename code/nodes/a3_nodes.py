@@ -124,7 +124,8 @@ def make_tldr_generator_node(
             return {}
         print("🎯 TL;DR Generator: Creating TL;DR...")
         reviewer_message = HumanMessage(
-            f"Following is the review from your reviewer:\n\n {state.get(TLDR_FEEDBACK, "No feedback provided")}\n\n"
+            "Following is the review from your reviewer:\n\n"
+            f"{state.get(TLDR_FEEDBACK, "No feedback provided")}\n\n"
         )
         messages = state[TLDR_GEN_MESSAGES] + [
             reviewer_message,

@@ -60,7 +60,7 @@ def initialize_a3_state(
     references_selector_prompt_cfg: dict,
     max_references: int,
     reviewer_prompt_cfg: dict,
-    max_revisions: int
+    max_revisions: int,
 ) -> A3SystemState:
     """Initialize the A3 system state with default values."""
     # manager system prompt
@@ -75,9 +75,7 @@ def initialize_a3_state(
     ]
     tldr_gen_messages = [
         SystemMessage(build_system_prompt_message(tldr_gen_prompt_cfg)),
-        SystemMessage(
-            f"Here's your input text for TL;DR generation:\n\n{input_text}"
-        ),
+        SystemMessage(f"Here's your input text for TL;DR generation:\n\n{input_text}"),
     ]
     # worker nodes system prompts. we dont add the publication text yet
     tag_types_prompt = generate_tag_types_prompt(tag_types)
@@ -122,11 +120,9 @@ def initialize_a3_state(
     ]
     reviewer_messages = [
         SystemMessage(build_system_prompt_message(reviewer_prompt_cfg)),
-        SystemMessage(
-            f"Here's your input text for review work:\n\n{input_text}"
-        ),
+        SystemMessage(f"Here's your input text for review work:\n\n{input_text}"),
     ]
-    
+
     return A3SystemState(
         input_text=input_text,
         manager_brief=None,
@@ -161,4 +157,3 @@ def initialize_a3_state(
         max_tags=max_tags,
         tag_types=tag_types,
     )
-
