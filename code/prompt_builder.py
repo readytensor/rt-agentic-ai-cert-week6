@@ -3,6 +3,8 @@ Prompt template construction functions for building modular prompts.
 """
 
 from typing import Union, List, Optional, Dict, Any
+from utils import load_config
+from paths import REASONING_CONFIG_FILE_PATH
 
 
 def lowercase_first_char(text: str) -> str:
@@ -34,57 +36,74 @@ def format_prompt_section(lead_in: str, value: Union[str, List[str]]) -> str:
     return f"{lead_in}\n{formatted_value}"
 
 
-def build_prompt_from_config(
-    config: Dict[str, Any],
+reasoning_strategies = load_config(REASONING_CONFIG_FILE_PATH).get(
+    "reasoning_strategies", {}
+)
+
+
+def build_prompt_body(
+    prompt_config: Dict[str, Any],
     input_data: str = "",
-    app_config: Optional[Dict[str, Any]] = None,
+    finalize: bool = True,  # <-- new flag
 ) -> str:
-    """Builds a complete prompt string based on a config dictionary.
+    """Constructs the full prompt body from a modular prompt config.
+
+    This function assembles a structured prompt using the components defined in the
+    provided `config`. It supports optional reasoning strategies, examples, constraints,
+    and formatting instructions. It is used as a common base for both one-shot prompt
+    strings and chat-based system messages.
 
     Args:
-        config: Dictionary specifying prompt components.
-        input_data: Content to be summarized or processed.
-        app_config: Optional app-wide configuration (e.g., reasoning strategies).
+        config (Dict[str, Any]): Dictionary containing modular prompt components such as
+            `role`, `instruction`, `context`, `output_constraints`, `style_or_tone`,
+            `output_format`, `examples`, `goal`, and `reasoning_strategy`.
+        input_data (str, optional): The user-provided content to be embedded into the prompt,
+            typically the document or text to be processed. Defaults to an empty string.
+        app_config (Optional[Dict[str, Any]]): Optional application-wide config, typically used
+            to look up reasoning strategy templates by name. Defaults to None.
+        finalize (bool, optional): Whether to append the final instruction
+            ("Now perform the task as instructed above.") to the prompt. This should be True
+            for one-shot prompts, and False for chat-based system prompts. Defaults to True.
 
     Returns:
-        A fully constructed prompt as a string.
+        str: A fully assembled prompt body string suitable for use in either one-shot or chat contexts.
 
     Raises:
-        ValueError: If the required 'instruction' field is missing.
+        ValueError: If the required `instruction` field is missing from the config.
     """
     prompt_parts = []
 
-    if role := config.get("role"):
+    if role := prompt_config.get("role"):
         prompt_parts.append(f"You are {lowercase_first_char(role.strip())}.")
 
-    instruction = config.get("instruction")
+    instruction = prompt_config.get("instruction")
     if not instruction:
         raise ValueError("Missing required field: 'instruction'")
     prompt_parts.append(format_prompt_section("Your task is as follows:", instruction))
 
-    if context := config.get("context"):
+    if context := prompt_config.get("context"):
         prompt_parts.append(f"Here’s some background that may help you:\n{context}")
 
-    if constraints := config.get("output_constraints"):
+    if constraints := prompt_config.get("output_constraints"):
         prompt_parts.append(
             format_prompt_section(
                 "Ensure your response follows these rules:", constraints
             )
         )
 
-    if tone := config.get("style_or_tone"):
+    if tone := prompt_config.get("style_or_tone"):
         prompt_parts.append(
             format_prompt_section(
                 "Follow these style and tone guidelines in your response:", tone
             )
         )
 
-    if format_ := config.get("output_format"):
+    if format_ := prompt_config.get("output_format"):
         prompt_parts.append(
             format_prompt_section("Structure your response as follows:", format_)
         )
 
-    if examples := config.get("examples"):
+    if examples := prompt_config.get("examples"):
         prompt_parts.append("Here are some examples to guide your response:")
         if isinstance(examples, list):
             for i, example in enumerate(examples, 1):
@@ -92,7 +111,7 @@ def build_prompt_from_config(
         else:
             prompt_parts.append(str(examples))
 
-    if goal := config.get("goal"):
+    if goal := prompt_config.get("goal"):
         prompt_parts.append(f"Your goal is to achieve the following outcome:\n{goal}")
 
     if input_data:
@@ -102,14 +121,29 @@ def build_prompt_from_config(
             "```\n" + input_data.strip() + "\n```\n<<<END CONTENT>>>"
         )
 
-    reasoning_strategy = config.get("reasoning_strategy")
-    if reasoning_strategy and reasoning_strategy != "None" and app_config:
-        strategies = app_config.get("reasoning_strategies", {})
-        if strategy_text := strategies.get(reasoning_strategy):
-            prompt_parts.append(strategy_text.strip())
+    if reasoning := prompt_config.get("reasoning_strategy"):
+        strategy_prompt = reasoning_strategies.get(reasoning, "")
+        if strategy_prompt:
+            prompt_parts.append(strategy_prompt.strip())
 
-    prompt_parts.append("Now perform the task as instructed above.")
+    if finalize:
+        prompt_parts.append("Now perform the task as instructed above.")
     return "\n\n".join(prompt_parts)
+
+
+def build_one_shot_prompt(
+    prompt_config: Dict[str, Any],
+    input_data: str = "",
+) -> str:
+    """Returns a single prompt string, suitable for one-shot use."""
+    return build_prompt_body(prompt_config, input_data, finalize=True)
+
+
+def build_system_prompt_message(
+    config: Dict[str, Any],
+) -> str:
+    """Returns a system message dict for message-based LLM interfaces."""
+    return build_prompt_body(config, input_data="", finalize=False)
 
 
 def print_prompt_preview(prompt: str, max_length: int = 500) -> None:

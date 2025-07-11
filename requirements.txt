@@ -11,9 +11,10 @@ spacy~=3.8.7
 https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl 
 tqdm~=4.67.1
 mcp~=1.9.4
-langchain_mcp_adapters~=0.1.7
-aiohttp~=3.10.0
+langchain_mcp_adapters
+aiohttp
 pygithub~=2.6.1
-langchain_tavily~=0.2.5
+langchain_tavily
 selenium~=4.34.0
 unstructured~=0.18.1
+black~=25.1.0

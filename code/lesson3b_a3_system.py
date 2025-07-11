@@ -1,174 +1,109 @@
-"""
-LangGraph implementation for multi-stage content processing.
-This graph orchestrates content analysis through multiple specialized nodes
-managed by a coordinator and reviewed by a final reviewer.
-"""
-
+from typing import Any, Dict, Sequence
 import os
-from typing import Dict, Any
-from langgraph.graph import StateGraph, START, END
-from langchain_core.runnables.graph import MermaidDrawMethod
-from utils import load_config, load_publication_example
-from paths import CONFIG_FILE_PATH, OUTPUTS_DIR
-from states_types.publication_info_generator import ContentProcessingState
-from nodes.publication_info_generator_nodes import (
-    manager_node,
-    tldr_generator_node,
-    title_generator_node,
-    tags_extractor_node,
-    web_search_references_generator_node,
-    reviewer_node,
-    route_from_reviewer,
+from pprint import pprint
+
+from graphs.a3_graph import build_a3_graph
+from states.a3_state import initialize_a3_state
+from utils import load_publication_example, load_config
+from langgraph_utils import save_graph_visualization
+from consts import (
+    MANAGER,
+    LLM_TAGS_GENERATOR,
+    TAG_TYPE_ASSIGNER,
+    TAGS_SELECTOR,
+    TLDR_GENERATOR,
+    TITLE_GENERATOR,
+    REFERENCES_GENERATOR,
+    REFERENCES_SELECTOR,
+    REVIEWER,
 )
 
-config = load_config(CONFIG_FILE_PATH)
 
-
-def create_agentic_authoring_graph() -> StateGraph:
+def run_a3_graph(text: str) -> Dict[str, Any]:
     """
-    Creates and returns the agentic authoring graph with hierarchical structure and feedback loop.
+    Runs the A3 agentic authoring graph with the provided LLM and configurations.
     """
-    # Create the graph
-    graph = StateGraph(ContentProcessingState)
 
-    # Add nodes
-    # Level 1: Manager
-    graph.add_node("manager", manager_node)
+    # Load configurations
+    a3_config = load_config()["a3_system"]
 
-    # Level 2: Processing nodes
-    graph.add_node("tldr_generator", tldr_generator_node)
-    graph.add_node("title_generator", title_generator_node)
-    graph.add_node("tags_extractor", tags_extractor_node)
-    graph.add_node(
-        "web_search_references_generator",
-        web_search_references_generator_node,
+    # # Initialize state
+    initial_state = initialize_a3_state(
+        input_text=text,
+        manager_prompt_cfg=a3_config["agents"][MANAGER]["prompt_config"],
+        llm_tags_generator_prompt_cfg=a3_config["agents"][LLM_TAGS_GENERATOR][
+            "prompt_config"
+        ],
+        tag_type_assigner_prompt_cfg=a3_config["agents"][TAG_TYPE_ASSIGNER][
+            "prompt_config"
+        ],
+        tags_selector_prompt_cfg=a3_config["agents"][TAGS_SELECTOR]["prompt_config"],
+        tag_types=a3_config["tag_types"],
+        max_tags=a3_config["max_tags"],
+        title_gen_prompt_cfg=a3_config["agents"][TITLE_GENERATOR]["prompt_config"],
+        tldr_gen_prompt_cfg=a3_config["agents"][TLDR_GENERATOR]["prompt_config"],
+        references_gen_prompt_cfg=a3_config["agents"][REFERENCES_GENERATOR][
+            "prompt_config"
+        ],
+        max_search_queries=a3_config["max_search_queries"],
+        references_selector_prompt_cfg=a3_config["agents"][REFERENCES_SELECTOR][
+            "prompt_config"
+        ],
+        max_references=a3_config["max_references"],
+        reviewer_prompt_cfg=a3_config["agents"][REVIEWER]["prompt_config"],
+        max_revisions=a3_config["max_revisions"],
     )
 
-    # Level 3: Reviewer
-    graph.add_node("reviewer", reviewer_node)
+    # # Build the graph
+    graph = build_a3_graph(a3_config)
+    save_graph_visualization(graph, graph_name="a3_system")
 
-    # Add edges - hierarchical structure with feedback loop
-    # START -> Manager (Level 1)
-    graph.add_edge(START, "manager")
-
-    # Manager -> All Level 2 nodes (parallel processing)
-    graph.add_edge("manager", "tldr_generator")
-    graph.add_edge("manager", "title_generator")
-    graph.add_edge("manager", "tags_extractor")
-    graph.add_edge("manager", "web_search_references_generator")
-
-    # All Level 2 nodes -> Reviewer (Level 3)
-    graph.add_edge("tldr_generator", "reviewer")
-    graph.add_edge("title_generator", "reviewer")
-    graph.add_edge("tags_extractor", "reviewer")
-    graph.add_edge("web_search_references_generator", "reviewer")
-
-    # Conditional edges from reviewer
-    graph.add_conditional_edges(
-        "reviewer",
-        route_from_reviewer,
-        {
-            "tldr_generator": "tldr_generator",
-            "title_generator": "title_generator",
-            "tags_extractor": "tags_extractor",
-            "web_search_references_generator": "web_search_references_generator",
-            "end": END,
-        },
-    )
-
-    return graph.compile()
-
-
-def visualize_graph(graph: StateGraph, save_path: str = OUTPUTS_DIR):
-    """Visualize the content processing graph."""
-    print("📊 Visualizing the content processing graph...")
-    print(graph.get_graph().draw_mermaid())
-
-    # Save the graph as PNG
-    try:
-        png = graph.get_graph().draw_mermaid_png(draw_method=MermaidDrawMethod.API)
-        with open(os.path.join(save_path, "content_processing_graph.png"), "wb") as f:
-            f.write(png)
-        print(
-            f"✅ Graph saved to {os.path.join(save_path, 'content_processing_graph.png')}"
-        )
-    except Exception as e:
-        print(f"⚠️ Could not save graph image: {e}")
-
-
-def run_agentic_authoring(text: str) -> Dict[str, Any]:
-    """
-    Convenience function to run the agentic authoring graph.
-
-    Args:
-        text: The text content to process
-
-    Returns:
-        Dictionary containing all processing results
-    """
-    # Create initial state
-    initial_state = ContentProcessingState(
-        text=text,
-        tldr=None,
-        title=None,
-        tags=None,
-        references=[],
-        references_content=[],
-        selected_references=[],
-        manager_decision=None,
-        revision_round=0,
-        needs_revision=None,
-        tldr_feedback=None,
-        title_feedback=None,
-        references_feedback=None,
-        tldr_approved=None,
-        title_approved=None,
-        references_approved=False,
-    )
-
-    # Create and run the graph
-    graph = create_agentic_authoring_graph()
-    visualize_graph(graph)
+    # Run the graph
     final_state = graph.invoke(initial_state)
-
     return final_state
 
 
 if __name__ == "__main__":
-    # Example usage with a sample text
-    publication_example_number = 2  # Can be 1, 2 or 3
-    publication_example = load_publication_example(publication_example_number)
+
+    # ⚠️⚠️⚠️ CAUTION: LONG + EXPENSIVE INPUTS ⚠️⚠️⚠️
+    # -------------------------------------------------------------------------------
+    # 🚨 Publication examples 2 and 3 are large and may take several minutes to process.
+    # 💸 They will consume a lot of tokens — which could cost you a few cents.
+    #
+    # 👉 For faster and cheaper runs:
+    #    - Use example 1
+    #    - Or create shorter versions of examples 2 and 3
+    #
+    # ✅ This project is for learning — don’t burn through tokens unnecessarily.
+    # -------------------------------------------------------------------------------
+
+    # Example usage
+    sample_text = load_publication_example(1)  # ⚠️ CAUTION: SEE NOTE ABOVE
+
+    response = run_a3_graph(sample_text)
 
     print("=" * 80)
-    print("🚀 CONTENT PROCESSING WORKFLOW DEMO")
+    print("🔍 A3-SYSTEM DEMO")
     print("=" * 80)
-
-    results = run_agentic_authoring(text=publication_example)
-
-    print("\n" + "=" * 80)
-    print("📋 FINAL PROCESSING RESULTS")
+    print("Manager brief:")
+    print(response["manager_brief"])
     print("=" * 80)
-
-    if results:
-        print(f"\n\n📌 Title: {results.get('title', 'N/A')}")
-        print(f"\n\n📝 TLDR: {results.get('tldr', 'N/A')}")
-        print(f"\n\n🏷️ Tags: {', '.join(results.get('tags', []))}")
-        print(f"\n\n📚 References: {(results.get('references', []))}")
-
-        results_to_save = ""
-
-        results_to_save += f"# Title(s)\n\n{results.get('title', 'N/A')}\n\n"
-        results_to_save += f"# TL;DR(s)\n\n{results.get('tldr', 'N/A')}\n\n"
-        results_to_save += f"# Tags\n\n{', '.join(results.get('tags', []))}\n\n"
-        results_to_save += f"# References\n\n"
-
-        for reference in results.get("references", []):
-            results_to_save += f"- [{reference.get('title')}]({reference.get('url')})\n"
-
-        with open(
-            f"outputs/publication_example_{publication_example_number}.md", "w"
-        ) as f:
-            f.write(results_to_save)
-
-    else:
-        print("❌ No results generated")
+    print("Title:")
+    print(response["title"])
+    print("=" * 80)
+    print("TL;DR:")
+    print(response["tldr"])
+    print("=" * 80)
+    print("Tags:")
+    pprint(response["selected_tags"])
+    print("=" * 80)
+    print("Search queries:")
+    pprint(response["reference_search_queries"])
+    print("=" * 80)
+    print("References:")
+    print("Selected # of references:", len(response["selected_references"]))
+    for ref in response["selected_references"]:
+        print(f"Title: {ref['title']}")
+        print(f"URL: {ref['url']}")
+        print("-" * 40)
+    print("=" * 80)
