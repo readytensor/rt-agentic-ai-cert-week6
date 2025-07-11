@@ -53,16 +53,113 @@ Go from MCP theory to practice. Learn how to connect your AI to existing MCP ser
 
 ---
 
-## 🚀 Coming Soon: Code & Exercises
+## Repository Structure
 
-Code examples, LangGraph scripts, and debugging utilities will be added soon to help you:
+```txt
+rt-agentic-ai-cert-week6/
+├── code/
+│   ├── graphs/
+│   │   ├── a3_graph.py                         # LangGraph definition for the A3 system
+│   │   └── tag_generation_graph.py             # LangGraph definition for tag extraction flow
+│   ├── nodes/
+│   │   ├── a3_nodes.py                         # Nodes for the A3 system (manager, tldr, title, etc.)
+│   │   ├── output_types.py                     # Pydantic output schemas for structured LLM responses
+│   │   └── tag_generation.py                   # Nodes for tag extraction (LLM, spaCy, gazetteer, etc.)
+│   ├── states/
+│   │   ├── a3_state.py                         # LangGraph state class for the A3 system
+│   │   └── tag_generation_state.py             # LangGraph state class for tag generation
+│   ├── consts.py                               # Global constants for key names and node labels
+│   ├── langgraph_utils.py                      # Utilities for visualizing LangGraphs and creating LLMs
+│   ├── lesson2b_extract_entities.py            # Lesson 2b: Run entity/tag extraction pipeline
+│   ├── lesson3b_a3_system.py                   # Lesson 3b: Run the full A3 authoring assistant system
+│   ├── lesson4_mcp.py                          # Lesson 4: MCP integration demo
+│   ├── llm.py                                  # LLM wrapper utility for structured outputs
+│   ├── paths.py                                # Path management for input/output/config files
+│   ├── prompt_builder.py                       # Utilities for building system and human prompts
+│   └── utils.py                                # Shared helper functions
+├── config/
+│   ├── config.yaml                             # Main configuration file for agents and flows
+│   ├── gazetteer_entities.yaml                 # Regex-based gazetteer entity definitions
+│   └── reasoning.yaml                          # Example config for reasoning patterns (if used)
+├── data/
+│   ├── publication_example1.md                 # Sample input articles
+│   ├── publication_example2.md
+│   └── publication_example3.md
+├── lessons/                                    # Lesson explanations and assets
+├── outputs/                                    # Output files and visualizations (e.g., graph.png)
+├── .env.example                                # Example environment file for API keys (e.g., Tavily)
+├── .gitignore
+├── LICENSE
+├── README.md                                   # You are here
+└── requirements.txt                            # Required Python dependencies
 
-- Implement and visualize multi-agent graphs
-- Define shared and isolated memory scopes
-- Manage inter-agent messaging and task delegation
-- Simulate collaboration and disagreement between agents
+```
 
-Stay tuned — this repo will be updated as the week progresses.
+---
+
+## Installation & Setup
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/readytensor/rt-agentic-ai-cert-week6.git
+   cd rt-agentic-ai-cert-week6
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Set up your environment variables:**
+
+   Copy the `.env.example` file and update it with your API keys and other required environment variables (e.g., for OpenAI or Tavily):
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   - You can get your [Open AI API key](https://platform.openai.com/signup) for LLM access.
+   - If using Tavily for search, sign up at [Tavily](https://www.tavily.com/) and add your API key to `.env`.
+
+---
+
+## Usage
+
+This week's code supports three lessons with runnable scripts:
+
+### 🏷️ Lesson 2b – Tag Extraction System
+
+Run the tag extraction system on example articles:
+
+```bash
+python code/lesson2b_extract_entities.py
+```
+
+This script uses the tag extraction pipeline built in Lesson 2b and processes articles from the `data/` folder.
+
+### 🧠 Lesson 3b – A3 (Agentic Authoring Assistant) System
+
+Run the full A3 system that generates tags, TL;DR, title, and references:
+
+```bash
+python code/lesson3b_a3_system.py
+```
+
+This script integrates multiple agents developed across lessons into a cohesive multi-agent authoring system.
+
+### 🔌 Lesson 4 – MCP Integration
+
+Try out basic MCP integration for agent-to-tool communication:
+
+```bash
+python code/lesson4_mcp.py
+```
+
+This demo shows how to connect your agents to external systems using the **Model Context Protocol**, as taught in Lessons 4a and 4b.
+
+You can modify or replace the input articles in the `data/` directory with your own content for experimentation.
 
 ---
 
