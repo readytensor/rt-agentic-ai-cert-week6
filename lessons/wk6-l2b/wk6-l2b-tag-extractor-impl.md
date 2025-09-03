@@ -14,7 +14,7 @@ In this lesson, we move from architecture to implementation by building the tag 
 
 # 🧭 From Vision to Code
 
-In the [last lesson](https://app.readytensor.ai/publications/Gq1xQ27DmJ56), we introduced our Week 6 project — an **Agentic Authoring Assistant** to help generate titles, tags, summaries, hero images, and references for AI publications. As a learning exercise, we scoped down to one essential subsystem: **tag extraction**.
+In the [last lesson](https://app.readytensor.ai/publications/Gq1xQ27DmJ56), we introduced our Week 6 project — an **Agentic Authoring Assistant** to help generate titles, tags, summaries, and references for AI publications. As a learning exercise, we scoped down to one essential subsystem: **tag extraction**.
 
 We described the design challenge, outlined the system’s requirements, and encouraged you to think through your own solution.
 
