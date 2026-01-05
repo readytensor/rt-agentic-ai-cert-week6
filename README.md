@@ -1,6 +1,6 @@
-# Ready Tensor Agentic AI Certification – Week 6
+# Ready Tensor Agentic AI Certification – Unit 6
 
-Welcome to **Week 6** of the [Agentic AI Developer Certification Program](https://app.readytensor.ai/publications/HrJ0xWtLzLNt) by Ready Tensor!
+Welcome to **Unit 6** of the [Agentic AI Developer Certification Program](https://app.readytensor.ai/publications/HrJ0xWtLzLNt) by Ready Tensor!
 
 [Last week](https://github.com/readytensor/rt-agentic-ai-cert-week5), you built your first **agentic systems** — intelligent assistants powered by LangGraph, memory, tools, and observability. This week, we take things further by shifting from **individual agents** to **multi-agent systems** that collaborate, specialize, and even debate.
 
@@ -8,7 +8,7 @@ Welcome to **Week 6** of the [Agentic AI Developer Certification Program](https:
 
 ## 🧠 What You'll Learn
 
-Week 6 is all about **system architecture** — designing agentic systems composed of multiple, modular agents that interact meaningfully and reliably. You’ll go from developer to **agent system designer**.
+Unit 6 is all about **system architecture** — designing agentic systems composed of multiple, modular agents that interact meaningfully and reliably. You’ll go from developer to **agent system designer**.
 
 By the end of the week, you’ll be able to:
 
@@ -56,7 +56,7 @@ Go from MCP theory to practice. Learn how to connect your AI to existing MCP ser
 ## Repository Structure
 
 ```txt
-rt-agentic-ai-cert-week6/
+rt-agentic-ai-cert-unit6/
 ├── code/
 │   ├── graphs/
 │   │   ├── a3_graph.py                         # LangGraph definition for the A3 system
